@@ -1,0 +1,13 @@
+<%- include('../partials/header') %>
+<section style="padding:30px;max-width:600px;margin:auto;">
+<h1>Profile Settings</h1>
+<form action="/api/v1/transaction/update-profile" method="POST" enctype="multipart/form-data">
+<input type="hidden" name="_method" value="PATCH" />
+<label>Change Profile Photo</label><br/><br/>
+<input type="file" name="image" accept="image/*"/><br/><br/>
+<input type="text" name="name" placeholder="Update Name"/><br/><br/>
+<input type="email" name="email" placeholder="Update Email"/><br/><br/>
+<button type="submit">Update Profile</button>
+</form>
+</section>
+<%- include('../partials/footer') %>

@@ -1,0 +1,17 @@
+<%- include('../partials/header') %>
+<section style="padding:30px;max-width:600px;margin:auto;">
+<h1>New Transaction</h1>
+<form action="/transaction/transaction" method="POST">
+<input type="number" name="transaction" placeholder="Amount" required/><br/><br/>
+<select name="method">
+<option value="credit">Credit</option>
+<option value="debit">Debit</option>
+</select><br/><br/>
+<button type="submit">Submit Transaction</button>
+</form>
+<div style="margin-top:30px;">
+<h3>Last 5 Transactions</h3>
+<p>Fetch from backend endpoint <strong>/transaction/recent</strong></p>
+</div>
+</section>
+<%- include('../partials/footer') %>
