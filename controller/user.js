@@ -2,6 +2,7 @@ const user = require("../model/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const sendMail = require("../utils/sendmail");
+const transaction = require("../model/transaction");
 exports.register = async (req, res) => {
   try {
     let passdata = req.body;
@@ -112,7 +113,7 @@ exports.updateProfile = async (req, res) => {
   try {
     const updateid = req.params.updateid;
 
-    // password update thay to j validation chalavo
+    // If password is being updated, validate and hash it
     if (req.body.password) {
       const password = req.body.password;
       const passwordRegex =
@@ -123,32 +124,31 @@ exports.updateProfile = async (req, res) => {
           message:
             "Password must be at least 8 characters and include uppercase, lowercase, number, and special character",
         });
-        // password
-        //  hash karo
-        const salt = await bcrypt.genSalt(10);
-        req.body.password = await bcrypt.hash(password, salt);
       }
+      // Hash the new password
+      const salt = await bcrypt.genSalt(10);
+      req.body.password = await bcrypt.hash(password, salt);
+    }
 
-      const updatedata = await user
-        .findByIdAndUpdate(updateid, req.body, {
-          new: true,
-          runValidators: true,
-        })
-        .select("-password");
+    const updatedata = await user
+      .findByIdAndUpdate(updateid, req.body, {
+        new: true,
+        runValidators: true,
+      })
+      .select("-password");
 
-      if (!updatedata) {
-        return res.status(404).json({
-          status: "fail",
-          message: "User not found",
-        });
-      }
-
-      res.status(200).json({
-        success: true,
-        message: "Profile updated successfully",
-        data: updatedata,
+    if (!updatedata) {
+      return res.status(404).json({
+        status: "fail",
+        message: "User not found",
       });
     }
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      data: updatedata,
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -162,28 +162,54 @@ exports.login = async (req, res) => {
     let passdata = req.body;
 
     const emailVerify = await user.findOne({
-      $or: [
-        { email: passdata.email },
-        { name: passdata.name },
-        { phone: passdata.phone },
-      ],
+       email: passdata.email 
+       
     });
-    console.log("emailVerify", emailVerify);
+   
 
-    if (!emailVerify) throw new Error("Invalid name or email or phone number");
+    if (!emailVerify) throw new Error("Account not found. Please register first.");
+
+    if (
+    emailVerify.lockUntil &&
+    emailVerify.lockUntil > Date.now()
+    ) {
+    throw new Error(
+    "Account locked. Try again after 5 minutes."
+    );
+    }
 
     const passwordVerify = await bcrypt.compare(
       passdata.password,
       emailVerify.password,
     );
-    console.log("passwordVerify", passwordVerify);
+  
 
-    if (!passwordVerify) throw new Error("Invalid password");
+    if (!passwordVerify) {
+
+  emailVerify.loginAttempts += 1;
+
+  if (emailVerify.loginAttempts >= 5) {
+
+    emailVerify.lockUntil =
+      new Date(Date.now() + 5 * 60 * 1000);
+
+    await emailVerify.save();
+
+    throw new Error(
+      "Account locked for 5 minutes due to multiple failed attempts."
+    );
+  }
+
+  await emailVerify.save();
+
+  throw new Error("Invalid password.");
+}
     
 
-    // if (emailVerify.isBlocked) {
-    //   throw new Error("Your account has been blocked");
-    // }
+    emailVerify.loginAttempts = 0;
+    emailVerify.lockUntil = null;
+
+await emailVerify.save();
 
     const token = jwt.sign({ id: emailVerify._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",

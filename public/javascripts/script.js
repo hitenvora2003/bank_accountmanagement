@@ -322,8 +322,9 @@ async function loadDashboard() {
       if (currentUser) {
         const name = currentUser.name || "—";
         document.getElementById("card-name").textContent = name;
+        const acc = String(currentUser.accountNo || "0000");
         document.getElementById("card-number").textContent =
-          `**** **** **** ${(currentUser.accountNo || "0000").toString().slice(-4)}`;
+        `**** **** **** ${acc.slice(-4)}`;
       }
 
       // Recent tbody
@@ -429,8 +430,10 @@ async function deleteAccount() {
 
       localStorage.clear();
 
-      // direct redirect
-      window.location.href = "/register.html";
+      // Show auth screen and switch to register tab
+      document.getElementById("app").style.display = "none";
+      document.getElementById("auth-screen").style.display = "flex";
+      switchAuth("register");
 
     }
   } catch (error) {

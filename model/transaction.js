@@ -16,7 +16,8 @@ const transactionschema = new mongoose.Schema({
         enum : ['credit','debit'],
         default : 'credit'
         
-}
+},
+
 
 },{timestamps : true})
 module.exports = mongoose.model('transaction', transactionschema)

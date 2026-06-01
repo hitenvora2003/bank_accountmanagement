@@ -1,20 +1,20 @@
 <%- include('../partials/header') %>
+<link rel="stylesheet" href="../../public/stylesheets/style.css">
 <section style="padding:40px;max-width:500px;margin:auto;">
 <h1>Welcome Back</h1>
-<form action="/users/login" method="POST">
+<form action="/login" method="POST">
 <input type="email" name="email" placeholder="Email" required class="form-control"/><br/><br/>
 <input type="password" name="password" placeholder="Password" required class="form-control"/><br/><br/>
 <button type="submit">Login</button>
 </form>
 
 <h2>Create Account</h2>
-<form action="/users/register" method="POST" enctype="multipart/form-data">
+<form action="/register" method="POST" enctype="multipart/form-data">
 <input type="text" name="name" placeholder="Full Name" required/><br/><br/>
 <input type="number" name="accountNo" placeholder="Account Number" required/><br/><br/>
 <input type="email" name="email" placeholder="Email" required/><br/><br/>
 <input type="number" name="phone" placeholder="Phone" required/><br/><br/>
 <input type="password" name="password" placeholder="Password" required/><br/><br/>
-<label>Upload Profile Photo</label><br/>
 <input type="file" name="image" accept="image/*"/><br/><br/>
 <button type="submit">Register</button>
 </form>

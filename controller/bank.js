@@ -106,6 +106,11 @@ exports.transaction = async (req, res) => {
     const alltransactions = await transaction.find({
       userid: userid,
 });
+// const amount = Number(req.body.transaction);
+
+//         if (amount >50000) {
+//         throw new Error("Maximum transaction limit is ₹50,000");
+//         }
 
     const balanceData = await transaction.aggregate([
       {
@@ -138,6 +143,7 @@ exports.transaction = async (req, res) => {
     if (!userdata) {
       throw new Error("User not found");
     }
+ 
     
     
     passdata.account_Holdername = userid;
