@@ -102,9 +102,9 @@ exports.transaction = async (req, res) => {
     const userid = req.user.id;
     console.log("======>",userid)
 
-    // 🔥 Current Balance Calculate
+   
     const alltransactions = await transaction.find({
-      userid: userid,
+      account_Holdername: userid
 });
 // const amount = Number(req.body.transaction);
 
@@ -188,91 +188,138 @@ exports.transaction = async (req, res) => {
 };
 exports.history = async (req, res) => {
   try {
-    // 🔥 Logged in user
+
     const userid = req.user.id;
 
-    // 🔥 Pagination
     const page = parseInt(req.query.page) || 1;
+
     const limit = parseInt(req.query.limit) || 10;
 
     const skip = (page - 1) * limit;
 
-    // 🔥 Paginated history
-const result = await transaction.aggregate([
-  {
-    $match: {
-      account_Holdername: new mongoose.Types.ObjectId(userid),
-    },
-  },
-  {
-    $facet: {
-      transactions: [
-        { $sort: { createdAt: -1 } },
-        { $skip: skip },
-        { $limit: limit },
-        {
-          $lookup: {
-            from: "users",
-            localField: "account_Holdername",
-            foreignField: "_id",
-            as: "account_Holdername",
-          },
-        },
-      ],
-      totalCount: [{ $count: "count" }],
-    },
-  },
-]);
-
-    const data = result[0].transactions;
-
-    const totalTransactions = result[0].totalCount[0]?.count || 0;
-
-    // 🔥 Balance calculate
-    const balanceData = await transaction.aggregate([
-  {
-    $match: {
-      account_Holdername: new mongoose.Types.ObjectId(userid),
-    },
-  },
-  {
-    $group: {
-      _id: null,
-      totalBalance: {
-        $sum: {
-          $cond: [
-            { $eq: ["$method", "credit"] },
-            "$transaction",
-            { $multiply: ["$transaction", -1] },
-          ],
+    const result = await transaction.aggregate([
+      {
+        $match: {
+          account_Holdername: new mongoose.Types.ObjectId(userid),
         },
       },
-    },
-  },
-]);
+
+      {
+        $facet: {
+
+          transactions: [
+
+            { $sort: { createdAt: -1 } },
+
+            { $skip: skip },
+
+            { $limit: limit },
+
+            {
+              $project: {
+
+                _id: 1,
+
+                transaction: 1,
+
+                method: 1,
+
+                senderName: 1,
+
+                receiverName: 1,
+
+                senderAccountNumber: 1,
+
+                receiverAccountNumber: 1,
+
+                transferType: 1,
+
+                createdAt: 1,
+
+              },
+            },
+
+          ],
+
+          totalCount: [
+            { $count: "count" }
+          ],
+
+        },
+      },
+    ]);
+
+    const data =
+      result[0].transactions || [];
+
+    const totalTransactions =
+      result[0].totalCount[0]?.count || 0;
+
+    const balanceData =
+      await transaction.aggregate([
+        {
+          $match: {
+            account_Holdername:
+              new mongoose.Types.ObjectId(userid),
+          },
+        },
+
+        {
+          $group: {
+
+            _id: null,
+
+            totalBalance: {
+              $sum: {
+                $cond: [
+                  { $eq: ["$method", "credit"] },
+                  "$transaction",
+                  { $multiply: ["$transaction", -1] },
+                ],
+              },
+            },
+
+          },
+        },
+      ]);
 
     const totalBalance =
-      balanceData.length > 0 ? balanceData[0].totalBalance : 0;
+      balanceData[0]?.totalBalance || 0;
 
-      res.status(200).json({
+    res.status(200).json({
+
       success: true,
 
       currentBalance: totalBalance,
 
       pagination: {
+
         currentPage: page,
-        limit: limit,
-        totalTransactions: totalTransactions,
-        totalPages: Math.ceil(totalTransactions / limit),
+
+        limit,
+
+        totalTransactions,
+
+        totalPages: Math.ceil(
+          totalTransactions / limit
+        ),
+
       },
 
       transactions: data,
+
     });
+
   } catch (error) {
+
     res.status(500).json({
+
       success: false,
+
       message: error.message,
+
     });
+
   }
 };
 exports.downloadStatement = async (req, res) => {
@@ -392,22 +439,57 @@ exports.transfer = async (req, res) => {
     }
 
     // Sender debit
-    await transaction.create({
-      account_Holdername: sender._id,
+    const transferType = "Transfer";
 
-      transaction: amount,
+// Sender Entry
+await transaction.create({
 
-      method: "debit",
-    });
+  account_Holdername: sender._id,
 
-    // Receiver credit
-    await transaction.create({
-      account_Holdername: receiver._id,
+  senderId: sender._id,
+  receiverId: receiver._id,
 
-      transaction: amount,
+  senderName: sender.name,
+  receiverName: receiver.name,
 
-      method: "credit",
-    });
+  senderAccountNumber:
+    sender.account_number,
+
+  receiverAccountNumber:
+    receiver.account_number,
+
+  transferType,
+
+  transaction: amount,
+
+  method: "debit",
+
+});
+
+// Receiver Entry
+await transaction.create({
+
+  account_Holdername: receiver._id,
+
+  senderId: sender._id,
+  receiverId: receiver._id,
+
+  senderName: sender.name,
+  receiverName: receiver.name,
+
+  senderAccountNumber:
+    sender.account_number,
+
+  receiverAccountNumber:
+    receiver.account_number,
+
+  transferType,
+
+  transaction: amount,
+
+  method: "credit",
+
+});
 
     // Update balance
     totalBalance -= amount;

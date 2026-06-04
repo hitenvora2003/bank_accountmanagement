@@ -1,17 +1,110 @@
 <%- include('../partials/header') %>
-<section style="padding:30px;max-width:600px;margin:auto;">
-<h1>New Transaction</h1>
-<form action="/transaction/transaction" method="POST">
-<input type="number" name="transaction" placeholder="Amount" required/><br/><br/>
-<select name="method">
-<option value="credit">Credit</option>
-<option value="debit">Debit</option>
-</select><br/><br/>
-<button type="submit">Submit Transaction</button>
-</form>
-<div style="margin-top:30px;">
-<h3>Last 5 Transactions</h3>
-<p>Fetch from backend endpoint <strong>/transaction/recent</strong></p>
-</div>
-</section>
-<%- include('../partials/footer') %>
+
+    <div id="app">
+
+        <%- include('../partials/sidebar') %>
+
+            <main class="main">
+                <div class="page" id="page-transaction">
+                    <div class="page-header">
+                        <div class="page-title">New Transaction</div>
+                        <div class="page-sub">Deposit or withdraw from your account</div>
+                    </div>
+                    <div style="
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 20px;
+              max-width: 800px;
+            ">
+                        <div class="card">
+                            <div class="section-title" style="margin-bottom: 20px">
+                                Transaction Details
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 16px">
+                                <div class="form-group">
+                                    <label>Transaction Type</label>
+                                    <div class="radio-group">
+                                        <div class="radio-opt selected" id="opt-credit" onclick="setMethod('credit')">
+                                            <svg width="14" height="14" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 4v16m8-8H4" />
+                                            </svg>
+                                            Credit
+                                        </div>
+                                        <div class="radio-opt" id="opt-debit" onclick="setMethod('debit')">
+                                            <svg width="14" height="14" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M20 12H4" />
+                                            </svg>
+                                            Debit
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Amount (₹)</label>
+                                    <input type="number" id="txn-amount" placeholder="0.00" min="1" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Account Holder ID</label>
+                                    <input type="text" id="txn-holder" placeholder="Auto-filled from session" readonly
+                                        style="opacity: 0.6" />
+                                </div>
+                                <button class="btn btn-primary" onclick="doTransaction()"
+                                    style="justify-content: center; margin-top: 4px">
+                                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Submit Transaction
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card" style="
+                background: linear-gradient(
+                  135deg,
+                  var(--surface2),
+                  var(--surface)
+                );
+              ">
+                            <div class="section-title" style="margin-bottom: 16px; color: var(--gold)">
+                                Balance Info
+                            </div>
+                            <div style="
+                  font-family: &quot;DM Mono&quot;, monospace;
+                  font-size: 36px;
+                  font-weight: 500;
+                  color: var(--text);
+                  margin-bottom: 6px;
+                " id="txn-balance-display">
+                                ₹0
+                            </div>
+                            <div style="font-size: 13px; color: var(--text-muted)">
+                                Available Balance
+                            </div>
+                            <div class="divider"></div>
+                            <div style="
+                  font-size: 13px;
+                  color: var(--text-dim);
+                  line-height: 1.8;
+                ">
+                                <div>• Credits increase your balance</div>
+                                <div>• Debits reduce your balance</div>
+                                <div>• A confirmation email is sent after each transaction</div>
+                                <div style="
+                    margin-top: 12px;
+                    color: var(--text-muted);
+                    font-size: 12px;
+                  ">
+                                    API: POST /transaction
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+    </div>
+
+    <%- include('../partials/footer') %>

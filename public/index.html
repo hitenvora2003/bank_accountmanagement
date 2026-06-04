@@ -210,7 +210,15 @@
 
     <!-- MAIN APP -->
     <div id="app" style="display: none">
+
+      <button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()">
+      <span></span>
+      <span></span>
+      <span></span>
+       </button>
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
       <aside class="sidebar" id="sidebar">
+        <button class="sidebar-close" id="sidebar-close" onclick="closeSidebar()">✕</button>
         <div class="logo">
           <div class="logo-mark">N</div>
           <span class="logo-text">NovaPay</span>
@@ -741,13 +749,17 @@
             <div class="table-wrap">
               <table>
                 <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Date & Time</th>
-                    <th>Account Holder</th>
-                    <th>Type</th>
-                    <th>Amount</th>
-                  </tr>
+               <tr>
+                  <th>#</th>
+                  <th>Date</th>
+                  <th>Sender</th>
+                  <th>Receiver</th>
+                  <th>Method</th>
+                  <th>Amount</th>
+                  <th>Sender A/c No</th>
+                  <th>Receiver A/c No</th>
+
+              </tr>
                 </thead>
                 <tbody id="history-tbody">
                   <tr>
@@ -928,6 +940,7 @@
         </div>
       </div>
     </div>
+    
 
     <!-- TOAST -->
     <div id="toast"></div>

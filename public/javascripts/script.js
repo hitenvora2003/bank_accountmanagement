@@ -2,6 +2,60 @@
 //  CONFIG — change base URL to your backend
 // ─────────────────────────────────────────────
 
+// ─────────────────────────────────────────────
+//  SIDEBAR RESPONSIVE TOGGLE
+// ─────────────────────────────────────────────
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  const isOpen  = sidebar.classList.contains('open');
+  if (isOpen) {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('visible');
+  } else {
+    sidebar.classList.add('open');
+    overlay.classList.add('visible');
+  }
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('visible');
+}
+
+// Auto-close sidebar when a nav item is clicked on mobile
+document.addEventListener('DOMContentLoaded', function () {
+  // Auto-close sidebar on nav click (mobile)
+  document.querySelectorAll('.nav-item').forEach(function (item) {
+    item.addEventListener('click', function () {
+      if (window.innerWidth <= 900) closeSidebar();
+    });
+  });
+
+  // Fix inline grid styles that can't be overridden by media queries
+  function applyResponsiveGridFix() {
+    if (window.innerWidth <= 900) {
+      document.querySelectorAll('.main [style*="grid-template-columns"]').forEach(function (el) {
+        el.style.gridTemplateColumns = '1fr';
+      });
+    } else {
+      // Restore original inline styles on resize to desktop
+      // Dashboard card grid
+      var dashGrid = document.querySelector('.main > .page > div[style]');
+      if (dashGrid) dashGrid.style.gridTemplateColumns = '1fr 1.4fr';
+      // Transaction grid
+      var txnGrid = document.querySelector('[style*="max-width: 800px"]');
+      if (txnGrid) txnGrid.style.gridTemplateColumns = '1fr 1fr';
+      // Quick actions
+      document.querySelectorAll('[style*="grid-template-columns: 1fr 1fr"]').forEach(function (el) {
+        el.style.gridTemplateColumns = '1fr 1fr';
+      });
+    }
+  }
+
+  applyResponsiveGridFix();
+  window.addEventListener('resize', applyResponsiveGridFix);
+});
 
 
 
@@ -292,6 +346,7 @@ function gotoPage(page) {
   if (page === "history") loadHistory(1);
   if (page === "dashboard") loadDashboard();
   if (page === "transfer") loadTransferBalanceAndBens();
+  if (page === "transaction")loadTransactionBalance();
 }
 
 // ─────────────────────────────────────────────
@@ -301,13 +356,12 @@ async function loadDashboard() {
   try {
     const r = await api("GET", "/api/v1/transaction/alldata?page=1&limit=10");
     if (r.success) {
-      const bal = r.currentBalance || 0;
+        const bal = r.currentBalance || 0;
       document.getElementById("stat-balance").textContent = fmt(bal);
       document.getElementById("card-balance").textContent = fmt(bal);
-      document.getElementById("stat-count").textContent =
-        r.pagination?.totaltransactions || 0;
-      document.getElementById("txn-balance-display").textContent = fmt(bal);
-      document.getElementById("transfer-avail").textContent = fmt(bal);
+      document.getElementById( "stat-count").textContent = r.pagination.totaltransactions || 0;
+
+    
 
       // calc credits/debits from data
       let credits = 0,
@@ -396,13 +450,17 @@ async function doTransaction() {
         } of ${fmt(amount)} successful!`,
 
         "success",
+
       );
 
       document.getElementById("txn-amount").value = "";
 
       document.getElementById("txn-balance-display").textContent = fmt(
         r.currentBalance || 0,
+
+        
       );
+
 
       loadDashboard();
     } else {
@@ -498,13 +556,29 @@ async function loadHistory(page = 1) {
           const holder = Array.isArray(t.account_Holdername)
             ? t.account_Holdername[0]?.name || "—"
             : t.account_Holdername?.name || currentUser?.name || "—";
-          return `<tr>
-          <td style="color:var(--text-muted);font-family:'DM Mono',monospace;font-size:12px">${(page - 1) * 10 + i + 1}</td>
-          <td style="font-size:12px;color:var(--text-dim)">${fmtDate(t.createdAt)}</td>
-          <td style="font-size:13px">${holder}</td>
-          <td><span class="badge badge-${t.method}">${t.method}</span></td>
-          <td class="amount amount-${t.method}">${t.method === "credit" ? "+" : "-"}${fmt(t.transaction)}</td>
-        </tr>`;
+        return `<tr>
+          
+        <td>${(page - 1) * 10 + i + 1}</td>
+         <td>${fmtDate(t.createdAt)}</td>
+         <td>${t.senderName || "Self"}</td>
+         <td>${t.receiverName || "Self"}</td>
+         <td>${t.method || "-"}</td>
+         <td class="amount amount-${t.method}">
+         ${t.method === "credit" ? "+" : "-"}
+  ${fmt(t.transaction)}
+</td>
+        
+
+ <td class="ac-number">${t.senderAccountNumber || "-"}</td>
+
+<td class="ac-number">${t.receiverAccountNumber || "-"}</td>
+
+
+
+
+
+</tr>
+`;
         })
         .join("");
       renderPagination(
@@ -583,7 +657,8 @@ function setTransferMode(mode) {
 
 async function loadTransferBalanceAndBens() {
   try {
-    const r = await api("GET", "/api/v1/alldata?page=1&limit=10");
+    const r = await api("GET", "/api/v1/transaction/alldata?page=1&limit=10");
+    console.log(r);
     if (r.success)
       document.getElementById("transfer-avail").textContent = fmt(
         r.currentBalance || 0,
@@ -602,6 +677,22 @@ async function loadTransferBalanceAndBens() {
         )
         .join("");
   } catch {}
+}
+async function loadTransactionBalance() {
+  try {
+    const r = await api(
+      "GET",
+      "/api/v1/transaction/alldata?page=1&limit=10"
+    );
+
+    if (r.success) {
+      document.getElementById(
+        "txn-balance-display"
+      ).textContent = fmt(r.currentBalance || 0);
+    }
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 async function doTransfer() {

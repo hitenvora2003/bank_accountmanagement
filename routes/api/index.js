@@ -7,7 +7,7 @@ const middleware = require('../../middleware/auth');
 // user routes
 router.post('/register', userController.register);
 router.get('/getusers', userController.getusers);
-router.patch('/:updateid', userController.updateProfile);
+router.patch('/:updateid', middleware.authcheck,userController.updateProfile);
 router.post('/login', userController.login);
 router.post('/forgotpassword', userController.forgotpassword);
 router.post('/verifyotp', userController.verifyotp);

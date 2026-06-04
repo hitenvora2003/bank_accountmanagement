@@ -32,7 +32,7 @@ app.use(cors());
 // app,use(sockets())
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static('./public'));
+
 
 // app.post('/login', (req, res) => {
 //   const token = "your_jwt_token_here";
