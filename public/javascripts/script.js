@@ -848,9 +848,12 @@ async function loadProfile() {
   // document.getElementById('profile-image').textContent = me.image||'—';
   document.getElementById("profile-name").textContent = currentUser.name || "—";
   document.getElementById("profile-email").textContent =
-    currentUser.email || "—";
+  currentUser.email || "—";
+  document.getElementById("profile-phone").textContent =
+  currentUser.phone || "—"; 
   document.getElementById("upd-name").value = currentUser.name || "";
   document.getElementById("upd-email").value = currentUser.email || "";
+
 
   // Try to load full profile
   try {
