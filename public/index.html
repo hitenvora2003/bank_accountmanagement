@@ -8,6 +8,9 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
     rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+    integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="stylesheets/style.css" />
   <style></style>
 </head>
@@ -337,7 +340,7 @@
           <div class="page-title">New Transaction</div>
           <div class="page-sub">Deposit or withdraw from your account</div>
         </div>
-        <div style="
+        <div class="" style="
               display: grid;
               grid-template-columns: 1fr 1fr;
               gap: 20px;
@@ -383,48 +386,38 @@
               </button>
             </div>
           </div>
-          <div class="card" style="
-                background: linear-gradient(
-                  135deg,
-                  var(--surface2),
-                  var(--surface)
-                );
-              ">
+          <div class="card" style="background: linear-gradient(135deg,var(--surface2),var(--surface));">
             <div class="section-title" style="margin-bottom: 16px; color: var(--gold)">
               Balance Info
             </div>
-            <div style="
-                  font-family: &quot;DM Mono&quot;, monospace;
-                  font-size: 36px;
-                  font-weight: 500;
-                  color: var(--text);
-                  margin-bottom: 6px;
-                " id="txn-balance-display">
-              ₹0
+
+            <div style="font-family: &quot;DM Mono&quot;, monospace;font-size: 36px; font-weight: 500;color: var(--text);margin-bottom: 6px;" id="txn-balance-display">₹0
             </div>
             <div style="font-size: 13px; color: var(--text-muted)">
               Available Balance
             </div>
             <div class="divider"></div>
-            <div style="
-                  font-size: 13px;
-                  color: var(--text-dim);
-                  line-height: 1.8;
-                ">
-              <div>• Credits increase your balance</div>
-              <div>• Debits reduce your balance</div>
-              <div>• A confirmation email is sent after each transaction</div>
-              <div style="
-                    margin-top: 12px;
-                    color: var(--text-muted);
-                    font-size: 12px;
-                  ">
-                API: POST /transaction
-              </div>
+            <div style="font-size: 13px;color: var(--text-dim);line-height: 1.8;">
+              <div><i class="fa-solid fa-arrows-to-dot"></i> Credits increase your balance</div>
+              <div><i class="fa-solid fa-arrows-to-dot"></i> Debits reduce your balance</div>
+              <div><i class="fa-solid fa-arrows-to-dot"></i> A confirmation email is sent after each transaction</div>
+
             </div>
+            
+
           </div>
+          <div class="recent-transactions-card">
+             <h3>Recent Transactions</h3>
+               <table>
+                 <tbody id="recent-5-tbody"></tbody>
+               </table>
+          </div>
+          
         </div>
+         
+        
       </div>
+
 
       <!-- TRANSFER -->
       <div class="page" id="page-transfer">

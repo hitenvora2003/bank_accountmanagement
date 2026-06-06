@@ -8,7 +8,7 @@
 function toggleSidebar() {
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('sidebar-overlay');
-  const isOpen  = sidebar.classList.contains('open');
+  const isOpen = sidebar.classList.contains('open');
   if (isOpen) {
     sidebar.classList.remove('open');
     overlay.classList.remove('visible');
@@ -128,7 +128,7 @@ function switchAuth(tab) {
   const tabs = ["login", "register", "forgot"];
   document
     .querySelectorAll(".auth-tab-btn")
-    [tabs.indexOf(tab)].classList.add("active");
+  [tabs.indexOf(tab)].classList.add("active");
 }
 
 async function doLogin(e) {
@@ -140,9 +140,9 @@ async function doLogin(e) {
     const r = await api("POST", "/api/v1/login", {
       email,
       password,
-      phone : email,
-      
-     
+      phone: email,
+
+
     });
     if (r.success && r.token) {
       token = r.token;
@@ -238,14 +238,14 @@ async function resetPass() {
 
 function logout() {
   token = "";
-  
+
   currentUser = null;
   localStorage.removeItem("np_token");
   localStorage.removeItem("np_user");
   document.getElementById("app").style.display = "none";
   document.getElementById("auth-screen").style.display = "flex";
 
-    localStorage.clear();
+  localStorage.clear();
 
   // Login fields clear
   const loginEmail =
@@ -254,9 +254,9 @@ function logout() {
   const loginPassword =
     document.getElementById("login-pass");
 
-  if(loginEmail) loginEmail.value = "";
+  if (loginEmail) loginEmail.value = "";
 
-  if(loginPassword) loginPassword.value = "";
+  if (loginPassword) loginPassword.value = "";
 
   // Register fields clear
   const regName =
@@ -271,16 +271,16 @@ function logout() {
   const regPassword =
     document.getElementById("reg-pass");
 
-  if(regName) regName.value = "";
+  if (regName) regName.value = "";
 
-  if(regEmail) regEmail.value = "";
+  if (regEmail) regEmail.value = "";
 
-  if(regPhone) regPhone.value = "";
+  if (regPhone) regPhone.value = "";
 
-  if(regPassword) regPassword.value = "";
+  if (regPassword) regPassword.value = "";
 
   // Redirect
-  
+
 
 }
 
@@ -313,7 +313,7 @@ function initApp() {
           ? "Good afternoon"
           : "Good evening";
     document.getElementById("dash-date").textContent =
-      greet + ", " + (currentUser.name || "") + " — here's your overview";
+      greet + " , " + (currentUser.name || "") + " — here's your overview";
   }
   loadDashboard();
   loadBeneficiaries();
@@ -346,7 +346,7 @@ function gotoPage(page) {
   if (page === "history") loadHistory(1);
   if (page === "dashboard") loadDashboard();
   if (page === "transfer") loadTransferBalanceAndBens();
-  if (page === "transaction")loadTransactionBalance();
+  if (page === "transaction") loadTransactionBalance();
 }
 
 // ─────────────────────────────────────────────
@@ -356,12 +356,12 @@ async function loadDashboard() {
   try {
     const r = await api("GET", "/api/v1/transaction/alldata?page=1&limit=10");
     if (r.success) {
-        const bal = r.currentBalance || 0;
+      const bal = r.currentBalance || 0;
       document.getElementById("stat-balance").textContent = fmt(bal);
       document.getElementById("card-balance").textContent = fmt(bal);
-      document.getElementById( "stat-count").textContent = r.pagination.totaltransactions || 0;
+      document.getElementById("stat-count").textContent = r.pagination.totaltransactions || 0;
 
-    
+
 
       // calc credits/debits from data
       let credits = 0,
@@ -376,9 +376,9 @@ async function loadDashboard() {
       if (currentUser) {
         const name = currentUser.name || "—";
         document.getElementById("card-name").textContent = name;
-        const acc = String(currentUser.accountNo || "0000");
+        const acc = String(currentUser.account_number || "0000");
         document.getElementById("card-number").textContent =
-        `**** **** **** ${acc.slice(-4)}`;
+          `**** **** **** ${acc.slice(-4)}`;
       }
 
       // Recent tbody
@@ -408,7 +408,7 @@ async function loadDashboard() {
 
 // ─────────────────────────────────────────────
 //  TRANSACTION
-// ─────────────────────────────────────────────
+// ─────────────────────────────────────────────  
 function setMethod(m) {
   txnMethod = m;
   document
@@ -445,8 +445,7 @@ async function doTransaction() {
 
     if (r.success) {
       toast(
-        `${
-          txnMethod === "credit" ? "Credit" : "Debit"
+        `${txnMethod === "credit" ? "Credit" : "Debit"
         } of ${fmt(amount)} successful!`,
 
         "success",
@@ -458,11 +457,17 @@ async function doTransaction() {
       document.getElementById("txn-balance-display").textContent = fmt(
         r.currentBalance || 0,
 
-        
+
       );
 
 
       loadDashboard();
+      loadRecentTransactions() 
+      
+      
+
+
+
     } else {
       toast(r.error || r.message, "error");
     }
@@ -470,6 +475,42 @@ async function doTransaction() {
     toast("Cannot reach server", "error");
   }
 }
+async function loadRecentTransactions() {
+  try {
+    const r = await api(
+      "GET",
+      "/api/v1/transaction/alldata?page=1&limit=5"
+    );
+
+    if (r.success) {
+      const tbody = document.getElementById("recent-5-tbody");
+
+      tbody.innerHTML = (r.result || [])
+        .slice(0, 5)
+        .map(
+          (t) => `
+          <tr>
+            <td>${fmtDate(t.createdAt)}</td>
+            <td>${t.method}</td>
+            <td class="amount-${t.method}">
+              ${t.method === "credit" ? "+" : "-"}
+              ${fmt(t.transaction)}
+            </td>
+          </tr>
+        `
+        )
+        .join("");
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+
+
+// -------------------Delete part-----------------
+
+
 async function deleteAccount() {
   const confirmDelete = confirm(
     "Are you sure you want to delete your account?",
@@ -484,7 +525,7 @@ async function deleteAccount() {
       "/api/v1/user/delete",
     );
 
-  if(r.success){
+    if (r.success) {
 
       localStorage.clear();
 
@@ -556,30 +597,20 @@ async function loadHistory(page = 1) {
           const holder = Array.isArray(t.account_Holdername)
             ? t.account_Holdername[0]?.name || "—"
             : t.account_Holdername?.name || currentUser?.name || "—";
-        return `<tr>
+          return `<tr>
           
-        <td>${(page - 1) * 10 + i + 1}</td>
+         <td>${(page - 1) * 10 + i + 1}</td>
          <td>${fmtDate(t.createdAt)}</td>
          <td>${t.senderName || "Self"}</td>
          <td>${t.receiverName || "Self"}</td>
          <td>${t.method || "-"}</td>
          <td class="amount amount-${t.method}">
          ${t.method === "credit" ? "+" : "-"}
-  ${fmt(t.transaction)}
-</td>
-        
-
- <td class="ac-number">${t.senderAccountNumber || "-"}</td>
-
-<td class="ac-number">${t.receiverAccountNumber || "-"}</td>
-
-
-
-
-
-</tr>
-`;
-        })
+         ${fmt(t.transaction)}</td>
+         <td class="ac-number">${t.senderAccountNumber || "-"}</td>
+         <td class="ac-number">${t.receiverAccountNumber || "-"}</td>
+          </tr>`;
+        }) 
         .join("");
       renderPagination(
         "hist-pagination",
@@ -663,7 +694,7 @@ async function loadTransferBalanceAndBens() {
       document.getElementById("transfer-avail").textContent = fmt(
         r.currentBalance || 0,
       );
-  } catch {}
+  } catch { }
   // populate beneficiary dropdown
   try {
     const bens = JSON.parse(localStorage.getItem("np_bens") || "[]");
@@ -676,7 +707,7 @@ async function loadTransferBalanceAndBens() {
             `<option value="${b._id}">${b.beneficiaryName} (${b.accountNo})</option>`,
         )
         .join("");
-  } catch {}
+  } catch { }
 }
 async function loadTransactionBalance() {
   try {
@@ -835,14 +866,14 @@ async function loadProfile() {
         document.getElementById("profile-role").textContent = me.role || "user";
         document.getElementById("profile-joined").textContent = me.createdAt
           ? new Date(me.createdAt).toLocaleDateString("en-IN", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })
           : "—";
       }
     }
-  } catch {}
+  } catch { }
 }
 
 async function doUpdateProfile() {
@@ -853,6 +884,7 @@ async function doUpdateProfile() {
   if (name) body.name = name;
   if (email) body.email = email;
   if (pass) body.password = pass;
+
   try {
     const r = await api("PATCH", `/api/v1/${currentUser.id}`, body);
     if (r.success) {
