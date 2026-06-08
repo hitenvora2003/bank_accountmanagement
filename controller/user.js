@@ -162,7 +162,11 @@ exports.login = async (req, res) => {
     let passdata = req.body;
 
     const emailVerify = await user.findOne({
-       email: passdata.email 
+      $or : [
+           {email: passdata.email },
+           {phone : passadata.phone}
+      ]
+      
        
     });
    
