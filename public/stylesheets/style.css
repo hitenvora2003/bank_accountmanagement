@@ -399,7 +399,7 @@ nav {
   );
 }
 
-.bank-card-chip {
+.bank-card-chip{
   width: 38px;
   height: 28px;
   background: linear-gradient(135deg, var(--gold), #7a5a10);
@@ -408,6 +408,7 @@ nav {
   position: relative;
   z-index: 1;
 }
+
 
 .bank-card-number {
   font-family: "DM Mono", monospace;
@@ -826,7 +827,7 @@ tr:last-child td {
 .page-btn {
   width: 32px;
   height: 32px;
-  border-radius: 7px;
+  border-radius: 50%;
   border: 1px solid var(--border);
   background: var(--surface2);
   color: var(--text-dim);
@@ -839,11 +840,13 @@ tr:last-child td {
   font-family: "DM Sans", sans-serif;
 }
 
+
 .page-btn:hover,
 .page-btn.active {
   border-color: var(--gold);
   color: var(--gold);
   background: var(--gold-dim);
+ 
 }
 
 .page-info {

@@ -580,7 +580,7 @@ async function loadHistory(page = 1) {
       "GET",
       `/api/v1/transaction/history/:${currentUser.id}?page=${page}&limit=10`,
     );
-    console.log(r);
+    console.log(r); 
     if (r.success) {
       const info = `Page ${page} of ${r.pagination?.totalPages || 1} — ${r.pagination?.totalTransactions || 0} transactions`;
       document.getElementById("hist-info").textContent = info;

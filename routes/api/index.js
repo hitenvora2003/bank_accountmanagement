@@ -14,7 +14,7 @@ router.post('/forgotpassword', userController.forgotpassword);
 router.post('/verifyotp', userController.verifyotp);
 router.post('/resetpassword', userController.resetpassword);
 router.delete('/user/delete', middleware.authcheck, userController.deleteAccount);
-router.patch('/:updateid', middleware.authcheck, userController.updateProfile);
+
 
 // transaction routes
 router.post('/transaction/transaction', middleware.authcheck, transactionController.transaction);

@@ -48,5 +48,9 @@ const userSchema = new mongoose.Schema({
     enum : ["user","admin"],
     default : "user"
     },
+    avatar: {
+        type: String,
+        default: null   // filename store thase (e.g. 174xxxx-image.jpg)
+    },
 },{timestamps : true})
 module.exports = mongoose.model("User",userSchema)
